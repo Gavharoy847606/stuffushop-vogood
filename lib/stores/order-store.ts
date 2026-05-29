@@ -178,12 +178,22 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 
   fetchOrders: async () => {
     set({ isLoading: true })
-    // Simulate API call with SQL JOIN
-    await new Promise(resolve => setTimeout(resolve, 500))
-    set({ orders: MOCK_ORDERS, isLoading: false })
+    try {
+      const response = await fetch('/api/orders')
+      const data = await response.json()
+      if (response.ok) {
+        set({ orders: data.orders, isLoading: false })
+      } else {
+        set({ isLoading: false })
+      }
+    } catch (error) {
+      console.error('Failed to fetch orders', error)
+      set({ isLoading: false })
+    }
   },
 
-  updateOrderStatus: (orderId: string, status: OrderStatus) => {
+  updateOrderStatus: async (orderId: string, status: OrderStatus) => {
+    // Optimistically update locally
     set(state => ({
       orders: state.orders.map(order =>
         order.id === orderId
@@ -191,6 +201,28 @@ export const useOrderStore = create<OrderState>((set, get) => ({
           : order
       )
     }))
+
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: orderId, status })
+      })
+
+      if (!response.ok) {
+        console.error('Failed to update order status in database')
+        // Rollback state by fetching orders again
+        const getOrdersResponse = await fetch('/api/orders')
+        const getOrdersData = await getOrdersResponse.json()
+        if (getOrdersResponse.ok) {
+          set({ orders: getOrdersData.orders })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update order status:', error)
+    }
   },
 
   setStatusFilter: (status: OrderStatus | 'all') => {
@@ -219,7 +251,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       )
     }
 
-    return filtered.sort((a, b) => 
+    return filtered.sort((a, b) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
   },
