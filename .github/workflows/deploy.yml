@@ -1,4 +1,4 @@
-name: CI/CD Enterprise ERP Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -6,39 +6,14 @@ on:
       - main
 
 jobs:
-  validate-and-build:
-    name: Validate and Build
+  deploy:
+    name: Deploy to EC2
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
-
-      - name: Enable corepack & pnpm
-        run: |
-          corepack enable
-          corepack prepare pnpm@8 --activate
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build Next.js
-        run: pnpm build
-
-  deploy-to-ec2:
-    name: Deploy to AWS EC2 via SSH
-    needs: validate-and-build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: SSH through appleboy and deploy
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
