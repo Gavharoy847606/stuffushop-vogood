@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type Page = "dashboard" | "inventory" | "orders" | "infrastructure";
+type Page = "dashboard" | "inventory" | "orders" ;
 
 interface DashboardLayoutProps {
   currentPage: Page;
