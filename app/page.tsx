@@ -7,9 +7,8 @@ import { DashboardLayout } from '@/components/erp/dashboard-layout'
 import { DashboardPage } from '@/components/erp/dashboard-page'
 import { InventoryPage } from '@/components/erp/inventory-page'
 import { OrdersPage } from '@/components/erp/orders-page'
-import { InfrastructurePage } from '@/components/erp/infrastructure-page'
 
-type Page = 'dashboard' | 'inventory' | 'orders' | 'infrastructure'
+type Page = 'dashboard' | 'inventory' | 'orders'
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore()
@@ -41,8 +40,6 @@ export default function Home() {
         return <InventoryPage />
       case 'orders':
         return <OrdersPage />
-      case 'infrastructure':
-        return <InfrastructurePage />
       default:
         return <DashboardPage />
     }
