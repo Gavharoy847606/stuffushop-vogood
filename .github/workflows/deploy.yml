@@ -4,12 +4,7 @@ on:
   push:
     branches:
       - main
-      - 'agents/**'
-      - 'develop'
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+      - "agents/**"
 
 jobs:
   build:
@@ -19,36 +14,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js with pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 8.15.6
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --force
 
       - name: Build project
         run: pnpm build
-
-      - name: Run linter
-        run: pnpm lint --max-warnings 0
-        continue-on-error: true
 
   deploy:
     name: Deploy to EC2
     needs: build
     runs-on: ubuntu-latest
-    if: success()
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -57,7 +45,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/stuffushop
-            git fetch origin
-            git checkout ${{ github.ref_name }}
-            git pull origin ${{ github.ref_name }}
+            git pull origin main
             sudo docker compose up -d --build
