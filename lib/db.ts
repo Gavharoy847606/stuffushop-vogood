@@ -643,7 +643,7 @@ export async function initDb() {
     try {
       await pool.query(`
         CREATE TABLE IF NOT EXISTS order_items (
-          id SERIAL PRIMARY KEY,
+          id VARCHAR(50) PRIMARY KEY,
           order_id VARCHAR(50) REFERENCES orders(id) ON DELETE CASCADE,
           product_id VARCHAR(50) NOT NULL,
           product_name VARCHAR(255) NOT NULL,
