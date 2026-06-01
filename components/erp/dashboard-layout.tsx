@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { useAuthStore } from '@/lib/stores/auth-store'
-import { useIsMobile } from '@/hooks/use-mobile'
+import { useState } from "react";
+import Link from "next/link";
+import { useAuthStore } from "@/lib/stores/auth-store";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   LayoutDashboard,
   Package,
@@ -13,40 +13,53 @@ import {
   Menu,
   X,
   ChevronRight,
-  Server
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+  Server,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 
-type Page = 'dashboard' | 'inventory' | 'orders' | 'infrastructure'
+type Page = "dashboard" | "inventory" | "orders" ;
 
 interface DashboardLayoutProps {
-  currentPage: Page
-  onPageChange: (page: Page) => void
-  children: React.ReactNode
+  currentPage: Page;
+  onPageChange: (page: Page) => void;
+  children: React.ReactNode;
 }
 
 const NAV_ITEMS: { id: Page; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-  { id: 'inventory', label: 'Inventory', icon: <Package className="w-5 h-5" /> },
-  { id: 'orders', label: 'Orders', icon: <ShoppingCart className="w-5 h-5" /> },
-  { id: 'infrastructure', label: 'Infra', icon: <Server className="w-5 h-5" /> },
-]
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: <LayoutDashboard className="w-5 h-5" />,
+  },
+  {
+    id: "inventory",
+    label: "Inventory",
+    icon: <Package className="w-5 h-5" />,
+  },
+  { id: "orders", label: "Orders", icon: <ShoppingCart className="w-5 h-5" /> },
+  // { id: 'infrastructure', label: 'Infra', icon: <Server className="w-5 h-5" /> },
+];
 
-function Sidebar({ currentPage, onPageChange, isOpen, onClose }: {
-  currentPage: Page
-  onPageChange: (page: Page) => void
-  isOpen: boolean
-  onClose: () => void
+function Sidebar({
+  currentPage,
+  onPageChange,
+  isOpen,
+  onClose,
+}: {
+  currentPage: Page;
+  onPageChange: (page: Page) => void;
+  isOpen: boolean;
+  onClose: () => void;
 }) {
-  const { user, logout } = useAuthStore()
+  const { user, logout } = useAuthStore();
 
   return (
     <>
@@ -59,13 +72,15 @@ function Sidebar({ currentPage, onPageChange, isOpen, onClose }: {
       )}
 
       {/* Sidebar */}
-      <aside className={`
+      <aside
+        className={`
         fixed top-0 left-0 z-50 h-full w-72
         glass-card border-r border-glass-border
         transform transition-transform duration-300 ease-in-out
         lg:translate-x-0 lg:static
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-glass-border">
@@ -75,8 +90,12 @@ function Sidebar({ currentPage, onPageChange, isOpen, onClose }: {
                   <span className="text-lg font-bold text-primary">S</span>
                 </div>
                 <div>
-                  <h1 className="font-bold text-foreground">STUFFUS<span className="text-primary">.ERP</span></h1>
-                  <p className="text-xs text-muted-foreground">Enterprise System</p>
+                  <h1 className="font-bold text-foreground">
+                    STUFFUS<span className="text-primary">.ERP</span>
+                  </h1>
+                  <p className="text-xs text-muted-foreground">
+                    Enterprise System
+                  </p>
                 </div>
               </Link>
               <Button
@@ -96,15 +115,16 @@ function Sidebar({ currentPage, onPageChange, isOpen, onClose }: {
               <button
                 key={item.id}
                 onClick={() => {
-                  onPageChange(item.id)
-                  onClose()
+                  onPageChange(item.id);
+                  onClose();
                 }}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-xl
                   transition-all duration-200
-                  ${currentPage === item.id
-                    ? 'bg-primary/20 text-primary glow-emerald'
-                    : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
+                  ${
+                    currentPage === item.id
+                      ? "bg-primary/20 text-primary glow-emerald"
+                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                   }
                 `}
               >
@@ -125,22 +145,29 @@ function Sidebar({ currentPage, onPageChange, isOpen, onClose }: {
                   <Avatar className="w-10 h-10 border-2 border-primary/30">
                     <AvatarImage src={user?.avatar} alt={user?.name} />
                     <AvatarFallback className="bg-primary/20 text-primary">
-                      {user?.name?.charAt(0) || 'U'}
+                      {user?.name?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-foreground">{user?.name}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {user?.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {user?.role}
+                    </p>
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 glass-card border-glass-border">
+              <DropdownMenuContent
+                align="end"
+                className="w-56 glass-card border-glass-border"
+              >
                 <DropdownMenuItem className="flex items-center gap-2">
                   <Settings className="w-4 h-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-glass-border" />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   className="flex items-center gap-2 text-destructive focus:text-destructive"
                   onClick={logout}
                 >
@@ -153,12 +180,15 @@ function Sidebar({ currentPage, onPageChange, isOpen, onClose }: {
         </div>
       </aside>
     </>
-  )
+  );
 }
 
-function BottomNav({ currentPage, onPageChange }: {
-  currentPage: Page
-  onPageChange: (page: Page) => void
+function BottomNav({
+  currentPage,
+  onPageChange,
+}: {
+  currentPage: Page;
+  onPageChange: (page: Page) => void;
 }) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden">
@@ -171,16 +201,19 @@ function BottomNav({ currentPage, onPageChange }: {
               className={`
                 flex flex-col items-center gap-1 px-4 py-2 rounded-xl
                 transition-all duration-200
-                ${currentPage === item.id
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                ${
+                  currentPage === item.id
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
                 }
               `}
             >
-              <div className={`
+              <div
+                className={`
                 p-2 rounded-xl transition-all duration-200
-                ${currentPage === item.id ? 'bg-primary/20 glow-emerald' : ''}
-              `}>
+                ${currentPage === item.id ? "bg-primary/20 glow-emerald" : ""}
+              `}
+              >
                 {item.icon}
               </div>
               <span className="text-xs font-medium">{item.label}</span>
@@ -189,12 +222,12 @@ function BottomNav({ currentPage, onPageChange }: {
         </div>
       </div>
     </nav>
-  )
+  );
 }
 
 function Header({ onMenuClick }: { onMenuClick: () => void }) {
-  const { user, logout } = useAuthStore()
-  const isMobile = useIsMobile()
+  const { user, logout } = useAuthStore();
+  const isMobile = useIsMobile();
 
   return (
     <header className="sticky top-0 z-30 glass-card border-b border-glass-border">
@@ -213,7 +246,9 @@ function Header({ onMenuClick }: { onMenuClick: () => void }) {
               <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
                 <span className="text-sm font-bold text-primary">S</span>
               </div>
-              <span className="font-semibold text-foreground">STUFFUS<span className="text-primary">.ERP</span></span>
+              <span className="font-semibold text-foreground">
+                STUFFUS<span className="text-primary">.ERP</span>
+              </span>
             </div>
           )}
         </div>
@@ -221,7 +256,8 @@ function Header({ onMenuClick }: { onMenuClick: () => void }) {
         <div className="flex items-center gap-3">
           {!isMobile && (
             <span className="text-sm text-muted-foreground">
-              Welcome, <span className="text-foreground font-medium">{user?.name}</span>
+              Welcome,{" "}
+              <span className="text-foreground font-medium">{user?.name}</span>
             </span>
           )}
           <DropdownMenu>
@@ -230,14 +266,19 @@ function Header({ onMenuClick }: { onMenuClick: () => void }) {
                 <Avatar className="w-9 h-9 border-2 border-primary/30 hover:border-primary/50 transition-colors">
                   <AvatarImage src={user?.avatar} alt={user?.name} />
                   <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                    {user?.name?.charAt(0) || 'U'}
+                    {user?.name?.charAt(0) || "U"}
                   </AvatarFallback>
                 </Avatar>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 glass-card border-glass-border">
+            <DropdownMenuContent
+              align="end"
+              className="w-56 glass-card border-glass-border"
+            >
               <div className="px-3 py-2">
-                <p className="text-sm font-medium text-foreground">{user?.name}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {user?.name}
+                </p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
               </div>
               <DropdownMenuSeparator className="bg-glass-border" />
@@ -246,7 +287,7 @@ function Header({ onMenuClick }: { onMenuClick: () => void }) {
                 <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-glass-border" />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="flex items-center gap-2 text-destructive focus:text-destructive"
                 onClick={logout}
               >
@@ -258,12 +299,16 @@ function Header({ onMenuClick }: { onMenuClick: () => void }) {
         </div>
       </div>
     </header>
-  )
+  );
 }
 
-export function DashboardLayout({ currentPage, onPageChange, children }: DashboardLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const isMobile = useIsMobile()
+export function DashboardLayout({
+  currentPage,
+  onPageChange,
+  children,
+}: DashboardLayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
     <div className="min-h-screen flex">
@@ -278,8 +323,10 @@ export function DashboardLayout({ currentPage, onPageChange, children }: Dashboa
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        
-        <main className={`flex-1 p-4 md:p-6 overflow-y-auto ${isMobile ? 'pb-28' : ''}`}>
+
+        <main
+          className={`flex-1 p-4 md:p-6 overflow-y-auto ${isMobile ? "pb-28" : ""}`}
+        >
           {children}
         </main>
       </div>
@@ -289,5 +336,5 @@ export function DashboardLayout({ currentPage, onPageChange, children }: Dashboa
         <BottomNav currentPage={currentPage} onPageChange={onPageChange} />
       )}
     </div>
-  )
+  );
 }
