@@ -37,6 +37,13 @@ function ProductCard({ product, onUpdateStock }: ProductCardProps) {
         <img
           src={product.image}
           alt={product.name}
+          loading="lazy"
+          onError={(e) => {
+            const target = e.currentTarget as HTMLImageElement;
+            target.onerror = null;
+            target.src =
+              "https://images.unsplash.com/photo-1583496661160-fb5886a0edd1?w=400&h=400&fit=crop";
+          }}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         {/* SKU Badge */}

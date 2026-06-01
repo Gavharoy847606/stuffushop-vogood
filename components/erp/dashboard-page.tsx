@@ -160,6 +160,13 @@ function LowStockWidget() {
                 <img
                   src={product.image}
                   alt={product.name}
+                  loading="lazy"
+                  onError={(e) => {
+                    const t = e.currentTarget as HTMLImageElement;
+                    t.onerror = null;
+                    t.src =
+                      "https://images.unsplash.com/photo-1583496661160-fb5886a0edd1?w=400&h=400&fit=crop";
+                  }}
                   className="w-10 h-10 rounded-lg object-cover"
                 />
                 <div>
