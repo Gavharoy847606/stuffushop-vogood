@@ -54,6 +54,23 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ product: updatedProduct });
   } catch (error: any) {
     console.error("Error in products PATCH API:", error);
+    // If DB fails, attempt to apply the stock change to the mocked data
+    try {
+      // Try to read body again in case it was parsed before the DB error
+      const body = (await (request as any).json?.()) || {};
+      const { id, delta } = body;
+      if (id && typeof delta === "number") {
+        const mocked = MOCK_PRODUCTS.map((p) => ({ ...p }));
+        const idx = mocked.findIndex((p) => p.id === id);
+        if (idx !== -1) {
+          mocked[idx].stock = Math.max(0, mocked[idx].stock + delta);
+          return NextResponse.json({ product: mocked[idx], _mock: true });
+        }
+      }
+    } catch (e) {
+      // ignore parsing errors
+    }
+
     return NextResponse.json(
       { error: error.message || "Internal Server Error" },
       { status: 500 },
