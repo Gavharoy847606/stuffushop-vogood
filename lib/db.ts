@@ -1,27 +1,29 @@
-import { Pool } from 'pg'
+import { Pool } from "pg";
 
 const pool = new Pool({
-  host: process.env.DB_HOST || 'dpg-d808kc8sfn5c739appug-a.virginia-postgres.render.com',
-  database: process.env.DB_NAME || 'localhost_mvo8',
-  user: process.env.DB_USER || 'wed',
+  host:
+    process.env.DB_HOST ||
+    "dpg-d808kc8sfn5c739appug-a.virginia-postgres.render.com",
+  database: process.env.DB_NAME || "localhost_mvo8",
+  user: process.env.DB_USER || "wed",
   password: process.env.DB_PASSWORD,
   port: 5432,
   ssl: {
-    rejectUnauthorized: false
-  }
-})
+    rejectUnauthorized: false,
+  },
+});
 
-let dbInitialized = false
+let dbInitialized = false;
 
 export async function query(text: string, params?: any[]) {
   if (!dbInitialized) {
-    await initDb()
+    await initDb();
   }
-  return pool.query(text, params)
+  return pool.query(text, params);
 }
 
 export async function initDb() {
-  if (dbInitialized) return
+  if (dbInitialized) return;
 
   try {
     // Create Users table
@@ -34,7 +36,7 @@ export async function initDb() {
         role VARCHAR(50) NOT NULL,
         avatar TEXT
       )
-    `)
+    `);
 
     // Create Products table
     await pool.query(`
@@ -49,12 +51,12 @@ export async function initDb() {
         image TEXT,
         min_stock INT NOT NULL
       )
-    `)
+    `);
 
-    // Create Orders table
+    // Create Orders table (use integer SERIAL id to match existing DBs)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
-        id VARCHAR(50) PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         order_number VARCHAR(50) UNIQUE NOT NULL,
         client_id VARCHAR(50) NOT NULL,
         client_name VARCHAR(100) NOT NULL,
@@ -65,33 +67,56 @@ export async function initDb() {
         updated_at TIMESTAMP NOT NULL,
         shipping_address TEXT
       )
-    `)
+    `);
 
-    // Create Order Items table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS order_items (
-        id SERIAL PRIMARY KEY,
-        order_id VARCHAR(50) REFERENCES orders(id) ON DELETE CASCADE,
-        product_id VARCHAR(50) NOT NULL,
-        product_name VARCHAR(255) NOT NULL,
-        quantity INT NOT NULL,
-        price NUMERIC(10, 2) NOT NULL
-      )
-    `)
+    // Create Order Items table (order_id should match orders.id type)
+    try {
+      await pool.query(`
+          CREATE TABLE IF NOT EXISTS order_items (
+            id SERIAL PRIMARY KEY,
+            order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+            product_id VARCHAR(50) NOT NULL,
+            product_name VARCHAR(255) NOT NULL,
+            quantity INT NOT NULL,
+            price NUMERIC(10, 2) NOT NULL
+          )
+        `);
+    } catch (fkError: any) {
+      // Some Postgres instances may have existing `orders.id` as integer.
+      // If the FK cannot be implemented due to type mismatch, create the
+      // order_items table without a foreign key so the app can operate.
+      if (fkError && fkError.code === "42804") {
+        console.warn(
+          "Foreign key on order_items could not be implemented; creating table without FK",
+        );
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS order_items (
+              id SERIAL PRIMARY KEY,
+              order_id VARCHAR(50),
+              product_id VARCHAR(50) NOT NULL,
+              product_name VARCHAR(255) NOT NULL,
+              quantity INT NOT NULL,
+              price NUMERIC(10, 2) NOT NULL
+            )
+          `);
+      } else {
+        throw fkError;
+      }
+    }
 
     // Seed Users if empty
-    const usersCount = await pool.query('SELECT COUNT(*) FROM clents')
+    const usersCount = await pool.query("SELECT COUNT(*) FROM clents");
     if (parseInt(usersCount.rows[0].count) === 0) {
       await pool.query(`
         INSERT INTO clents (id, email, password, name, role, avatar) VALUES
         ('1', 'anvar@gmail.com', 'pass123', 'Anvar Admin', 'admin', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'),
         ('2', 'manager@erp.com', 'password123', 'Maria Manager', 'manager', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'),
         ('3', 'employee@erp.com', 'password123', 'John Employee', 'employee', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face')
-      `)
+      `);
     }
 
     // Seed Products if empty
-    const productsCount = await pool.query('SELECT COUNT(*) FROM products')
+    const productsCount = await pool.query("SELECT COUNT(*) FROM products");
     if (parseInt(productsCount.rows[0].count) === 0) {
       await pool.query(`
         INSERT INTO products (id, sku, name, description, price, stock, category, image, min_stock) VALUES
@@ -107,108 +132,108 @@ export async function initDb() {
         ('10', 'CHN-010', 'Chino Pants', 'Classic fit chino pants', 59.99, 35, 'Bottoms', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=400&fit=crop', 15),
         ('11', 'PLO-011', 'Polo Shirt', 'Classic polo shirt', 49.99, 0, 'Tops', 'https://images.unsplash.com/photo-1625910513413-5fc45b28e9d5?w=400&h=400&fit=crop', 20),
         ('12', 'CTN-012', 'Trench Coat', 'Waterproof trench coat', 189.99, 7, 'Outerwear', 'https://images.unsplash.com/photo-1544923246-77307dd628b7?w=400&h=400&fit=crop', 5)
-      `)
+      `);
     }
 
     // Seed Orders and Order Items if empty
-    const ordersCount = await pool.query('SELECT COUNT(*) FROM orders')
+    const ordersCount = await pool.query("SELECT COUNT(*) FROM orders");
     if (parseInt(ordersCount.rows[0].count) === 0) {
       // Order 1
       await pool.query(`
-        INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('1', 'ORD-2024-001', 'CLT-001', 'Fashion Forward LLC', 'orders@fashionforward.com', 5249.65, 'completed', '2024-01-15T10:30:00Z', '2024-01-18T14:20:00Z', '123 Fashion Ave, New York, NY 10001')
-      `)
+        INSERT INTO orders (order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
+        VALUES ('ORD-2024-001', 'CLT-001', 'Fashion Forward LLC', 'orders@fashionforward.com', 5249.65, 'completed', '2024-01-15T10:30:00Z', '2024-01-18T14:20:00Z', '123 Fashion Ave, New York, NY 10001')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('1', '1', 'Premium Leather Jacket', 10, 299.99),
-        ('1', '3', 'Slim Fit Denim', 25, 89.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-001'), '1', 'Premium Leather Jacket', 10, 299.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-001'), '3', 'Slim Fit Denim', 25, 89.99)
+      `);
 
       // Order 2
       await pool.query(`
-        INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('2', 'ORD-2024-002', 'CLT-002', 'Urban Style Co.', 'purchasing@urbanstyle.com', 8899.20, 'pending', '2024-01-20T09:15:00Z', '2024-01-20T09:15:00Z', '456 Urban Blvd, Los Angeles, CA 90001')
-      `)
+        INSERT INTO orders (order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
+        VALUES ('ORD-2024-002', 'CLT-002', 'Urban Style Co.', 'purchasing@urbanstyle.com', 8899.20, 'pending', '2024-01-20T09:15:00Z', '2024-01-20T09:15:00Z', '456 Urban Blvd, Los Angeles, CA 90001')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('2', '5', 'Urban Sneakers', 50, 129.99),
-        ('2', '6', 'Wool Blend Hoodie', 30, 79.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-002'), '5', 'Urban Sneakers', 50, 129.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-002'), '6', 'Wool Blend Hoodie', 30, 79.99)
+      `);
 
       // Order 3
       await pool.query(`
-        INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('3', 'ORD-2024-003', 'CLT-003', 'Elite Boutique', 'orders@eliteboutique.com', 7999.65, 'processing', '2024-01-22T11:45:00Z', '2024-01-23T08:30:00Z', '789 Elite Plaza, Miami, FL 33101')
-      `)
+        INSERT INTO orders (order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
+        VALUES ('ORD-2024-003', 'CLT-003', 'Elite Boutique', 'orders@eliteboutique.com', 7999.65, 'processing', '2024-01-22T11:45:00Z', '2024-01-23T08:30:00Z', '789 Elite Plaza, Miami, FL 33101')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('3', '4', 'Elegant Evening Dress', 15, 199.99),
-        ('3', '9', 'Cashmere Sweater', 20, 249.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-003'), '4', 'Elegant Evening Dress', 15, 199.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-003'), '9', 'Cashmere Sweater', 20, 249.99)
+      `);
 
       // Order 4
       await pool.query(`
         INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('4', 'ORD-2024-004', 'CLT-004', 'Trendy Threads Inc.', 'supply@trendythreads.com', 5998.50, 'shipped', '2024-01-25T14:00:00Z', '2024-01-27T10:15:00Z', '321 Trend Street, Chicago, IL 60601')
-      `)
+        VALUES ('ORD-2024-004', 'CLT-004', 'Trendy Threads Inc.', 'supply@trendythreads.com', 5998.50, 'shipped', '2024-01-25T14:00:00Z', '2024-01-27T10:15:00Z', '321 Trend Street, Chicago, IL 60601')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('4', '2', 'Cotton Basic Tee', 100, 29.99),
-        ('4', '10', 'Chino Pants', 50, 59.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-004'), '2', 'Cotton Basic Tee', 100, 29.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-004'), '10', 'Chino Pants', 50, 59.99)
+      `);
 
       // Order 5
       await pool.query(`
         INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('5', 'ORD-2024-005', 'CLT-005', 'Classic Wear Ltd.', 'orders@classicwear.com', 5599.40, 'pending', '2024-01-28T16:30:00Z', '2024-01-28T16:30:00Z', '654 Classic Lane, Boston, MA 02101')
-      `)
+        VALUES ('ORD-2024-005', 'CLT-005', 'Classic Wear Ltd.', 'orders@classicwear.com', 5599.40, 'pending', '2024-01-28T16:30:00Z', '2024-01-28T16:30:00Z', '654 Classic Lane, Boston, MA 02101')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('5', '7', 'Classic Blazer', 20, 179.99),
-        ('5', '11', 'Polo Shirt', 40, 49.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-005'), '7', 'Classic Blazer', 20, 179.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-005'), '11', 'Polo Shirt', 40, 49.99)
+      `);
 
       // Order 6
       await pool.query(`
         INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('6', 'ORD-2024-006', 'CLT-006', 'Seasonal Styles', 'buying@seasonalstyles.com', 4599.60, 'completed', '2024-01-10T08:00:00Z', '2024-01-15T12:00:00Z', '987 Season Ave, Seattle, WA 98101')
-      `)
+        VALUES ('ORD-2024-006', 'CLT-006', 'Seasonal Styles', 'buying@seasonalstyles.com', 4599.60, 'completed', '2024-01-10T08:00:00Z', '2024-01-15T12:00:00Z', '987 Season Ave, Seattle, WA 98101')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('6', '12', 'Trench Coat', 15, 189.99),
-        ('6', '8', 'Pleated Midi Skirt', 25, 69.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-006'), '12', 'Trench Coat', 15, 189.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-006'), '8', 'Pleated Midi Skirt', 25, 69.99)
+      `);
 
       // Order 7
       await pool.query(`
         INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('7', 'ORD-2024-007', 'CLT-007', 'Metro Fashion Group', 'procurement@metrofashion.com', 7249.70, 'pending', '2024-01-29T13:45:00Z', '2024-01-29T13:45:00Z', '111 Metro Center, Denver, CO 80201')
-      `)
+        VALUES ('ORD-2024-007', 'CLT-007', 'Metro Fashion Group', 'procurement@metrofashion.com', 7249.70, 'pending', '2024-01-29T13:45:00Z', '2024-01-29T13:45:00Z', '111 Metro Center, Denver, CO 80201')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('7', '1', 'Premium Leather Jacket', 5, 299.99),
-        ('7', '4', 'Elegant Evening Dress', 10, 199.99),
-        ('7', '9', 'Cashmere Sweater', 15, 249.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-007'), '1', 'Premium Leather Jacket', 5, 299.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-007'), '4', 'Elegant Evening Dress', 10, 199.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-007'), '9', 'Cashmere Sweater', 15, 249.99)
+      `);
 
       // Order 8
       await pool.query(`
         INSERT INTO orders (id, order_number, client_id, client_name, client_email, total_amount, status, created_at, updated_at, shipping_address)
-        VALUES ('8', 'ORD-2024-008', 'CLT-008', 'Coastal Apparel', 'orders@coastalapparel.com', 7198.60, 'completed', '2024-01-05T10:00:00Z', '2024-01-10T16:00:00Z', '222 Coastal Drive, San Diego, CA 92101')
-      `)
+        VALUES ('ORD-2024-008', 'CLT-008', 'Coastal Apparel', 'orders@coastalapparel.com', 7198.60, 'completed', '2024-01-05T10:00:00Z', '2024-01-10T16:00:00Z', '222 Coastal Drive, San Diego, CA 92101')
+      `);
       await pool.query(`
         INSERT INTO order_items (order_id, product_id, product_name, quantity, price) VALUES
-        ('8', '6', 'Wool Blend Hoodie', 60, 79.99),
-        ('8', '2', 'Cotton Basic Tee', 80, 29.99)
-      `)
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-008'), '6', 'Wool Blend Hoodie', 60, 79.99),
+        ((SELECT id FROM orders WHERE order_number='ORD-2024-008'), '2', 'Cotton Basic Tee', 80, 29.99)
+      `);
     }
 
-    dbInitialized = true
-    console.log('Database initialized successfully')
+    dbInitialized = true;
+    console.log("Database initialized successfully");
   } catch (error) {
-    console.error('Error during database initialization:', error)
-    throw error
+    console.error("Error during database initialization:", error);
+    throw error;
   }
 }
 
-export default pool
+export default pool;
