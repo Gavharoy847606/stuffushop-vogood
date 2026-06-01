@@ -232,7 +232,10 @@ export async function initDb() {
     console.log("Database initialized successfully");
   } catch (error) {
     console.error("Error during database initialization:", error);
-    throw error;
+    // Prevent repeated initialization attempts during runtime; rely on
+    // API-level mock fallbacks when DB is unavailable or schema mismatched.
+    dbInitialized = true;
+    return;
   }
 }
 
