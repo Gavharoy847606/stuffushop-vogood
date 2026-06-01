@@ -154,11 +154,11 @@ function LowStockWidget() {
           lowStock.map((product) => (
             <div
               key={product.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-warning/5 border border-warning/20"
+              className="flex-col items-center justify-between p-3 rounded-lg bg-warning/5 border border-warning/20"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex-col items-center gap-3">
                 <img
-                  src={product.image}
+                  src="https://images.unsplash.com/photo-1490730141103-6cac27aaab94?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZSUyMGltYWdlfGVufDB8fDB8fHww"
                   alt={product.name}
                   loading="lazy"
                   onError={(e) => {
@@ -167,7 +167,7 @@ function LowStockWidget() {
                     t.src =
                       "https://images.unsplash.com/photo-1583496661160-fb5886a0edd1?w=400&h=400&fit=crop";
                   }}
-                  className="w-10 h-10 rounded-lg object-cover"
+                  className="w-400 h-100 rounded-lg object-cover"
                 />
                 <div>
                   <p className="text-sm font-medium text-foreground">

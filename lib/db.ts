@@ -109,9 +109,10 @@ export async function initDb() {
     if (parseInt(usersCount.rows[0].count) === 0) {
       await pool.query(`
         INSERT INTO clents (id, email, password, name, role, avatar) VALUES
-        ('1', 'anvar@gmail.com', 'pass123', 'Anvar Admin', 'admin', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'),
-        ('2', 'manager@erp.com', 'password123', 'Maria Manager', 'manager', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'),
-        ('3', 'employee@erp.com', 'password123', 'John Employee', 'employee', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face')
+        ('1', 'admin@gmail.com', 'admin', 'Admin User', 'admin', 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=100&h=100&fit=crop&crop=face'),
+        ('2', 'anvar.admin@erp.com', 'password123', 'Anvar Admin', 'admin', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'),
+        ('3', 'manager@erp.com', 'password123', 'Maria Manager', 'manager', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face'),
+        ('4', 'employee@erp.com', 'password123', 'John Employee', 'employee', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face')
       `);
     }
 

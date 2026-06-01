@@ -1,6 +1,25 @@
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
 
+const FALLBACK_USERS = [
+  {
+    id: '1',
+    email: 'admin@gmail.com',
+    password: 'admin',
+    name: 'Admin User',
+    role: 'admin',
+    avatar: 'https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=100&h=100&fit=crop&crop=face'
+  },
+  {
+    id: '2',
+    email: 'anvar.admin@erp.com',
+    password: 'password123',
+    name: 'Anvar Admin',
+    role: 'admin',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
+  }
+]
+
 export async function POST(request: Request) {
   try {
     const { email, password } = await request.json()
@@ -11,11 +30,17 @@ export async function POST(request: Request) {
 
     const res = await query('SELECT * FROM clents WHERE LOWER(email) = LOWER($1)', [email])
 
-    if (res.rows.length === 0) {
-      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+    let user = res.rows[0]
+
+    if (!user) {
+      user = FALLBACK_USERS.find(
+        (fallback) => fallback.email.toLowerCase() === email.toLowerCase(),
+      )
     }
 
-    const user = res.rows[0]
+    if (!user || user.password !== password) {
+      return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
+    }
 
     // In production, we'd use bcrypt/argon2 to compare hashed passwords.
     // For this exact migration, we match the mock auth store password logic.
