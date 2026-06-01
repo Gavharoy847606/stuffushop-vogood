@@ -25,8 +25,13 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  let id: string | undefined;
+  let delta: number | undefined;
+
   try {
-    const { id, delta } = await request.json();
+    const body = await request.json();
+    id = body.id;
+    delta = body.delta;
 
     if (!id || typeof delta !== "number") {
       return NextResponse.json(
@@ -55,20 +60,13 @@ export async function PATCH(request: Request) {
   } catch (error: any) {
     console.error("Error in products PATCH API:", error);
     // If DB fails, attempt to apply the stock change to the mocked data
-    try {
-      // Try to read body again in case it was parsed before the DB error
-      const body = (await (request as any).json?.()) || {};
-      const { id, delta } = body;
-      if (id && typeof delta === "number") {
-        const mocked = MOCK_PRODUCTS.map((p) => ({ ...p }));
-        const idx = mocked.findIndex((p) => p.id === id);
-        if (idx !== -1) {
-          mocked[idx].stock = Math.max(0, mocked[idx].stock + delta);
-          return NextResponse.json({ product: mocked[idx], _mock: true });
-        }
+    if (id && typeof delta === "number") {
+      const mocked = MOCK_PRODUCTS.map((p) => ({ ...p }));
+      const idx = mocked.findIndex((p) => p.id === id);
+      if (idx !== -1) {
+        mocked[idx].stock = Math.max(0, mocked[idx].stock + delta);
+        return NextResponse.json({ product: mocked[idx], _mock: true });
       }
-    } catch (e) {
-      // ignore parsing errors
     }
 
     return NextResponse.json(
