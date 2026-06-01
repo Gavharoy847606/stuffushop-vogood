@@ -170,12 +170,22 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
   fetchProducts: async () => {
     set({ isLoading: true })
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500))
-    set({ products: MOCK_PRODUCTS, isLoading: false })
+    try {
+      const response = await fetch('/api/products')
+      const data = await response.json()
+      if (response.ok) {
+        set({ products: data.products, isLoading: false })
+      } else {
+        set({ isLoading: false })
+      }
+    } catch (error) {
+      console.error('Failed to fetch products', error)
+      set({ isLoading: false })
+    }
   },
 
-  updateStock: (productId: string, delta: number) => {
+  updateStock: async (productId: string, delta: number) => {
+    // Optimistically update stock in UI state
     set(state => ({
       products: state.products.map(product =>
         product.id === productId
@@ -183,6 +193,28 @@ export const useProductStore = create<ProductState>((set, get) => ({
           : product
       )
     }))
+
+    try {
+      const response = await fetch('/api/products', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: productId, delta })
+      })
+
+      if (!response.ok) {
+        console.error('Failed to update stock in database')
+        // Rollback state by re-fetching all products
+        const getProductsResponse = await fetch('/api/products')
+        const getProductsData = await getProductsResponse.json()
+        if (getProductsResponse.ok) {
+          set({ products: getProductsData.products })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update stock in database:', error)
+    }
   },
 
   setFilter: (filter: string) => {
