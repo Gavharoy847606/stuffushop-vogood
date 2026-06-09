@@ -158,14 +158,14 @@ function LowStockWidget() {
             >
               <div className="flex-col items-center gap-3">
                 <img
-                  src="https://images.unsplash.com/photo-1490730141103-6cac27aaab94?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZSUyMGltYWdlfGVufDB8fDB8fHww"
+                  src="https://kaleidoscope.scene7.com/is/image/OttoUK/600w/Witt-Denim-Pleat-Midi-Skirt~B51972FRSP.jpg"
                   alt={product.name}
                   loading="lazy"
                   onError={(e) => {
                     const t = e.currentTarget as HTMLImageElement;
                     t.onerror = null;
                     t.src =
-                      "https://images.unsplash.com/photo-1583496661160-fb5886a0edd1?w=400&h=400&fit=crop";
+                      "https://kaleidoscope.scene7.com/is/image/OttoUK/600w/Witt-Denim-Pleat-Midi-Skirt~B51972FRSP.jpg";
                   }}
                   className="w-400 h-100 rounded-lg object-cover"
                 />

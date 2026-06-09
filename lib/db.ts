@@ -128,11 +128,11 @@ export async function initDb() {
         ('5', 'SNK-005', 'Urban Sneakers', 'Comfortable street-style sneakers', 129.99, 0, 'Footwear', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop', 10),
         ('6', 'HDE-006', 'Wool Blend Hoodie', 'Premium wool-blend hoodie', 79.99, 25, 'Tops', 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop', 10),
         ('7', 'BLZ-007', 'Classic Blazer', 'Tailored fit blazer', 179.99, 12, 'Outerwear', 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=400&fit=crop', 8),
-        ('8', 'SKT-008', 'Pleated Midi Skirt', 'Elegant pleated skirt', 69.99, 3, 'Bottoms', 'https://images.unsplash.com/photo-1583496661160-fb5886a0edd1?w=400&h=400&fit=crop', 8),
+        ('8', 'SKT-008', 'Pleated Midi Skirt', 'Elegant pleated skirt', 69.99, 3, 'Bottoms', 'https://uptownie.com/cdn/shop/files/03-05-202507811_1500x.jpg?v=1759496559', 8),
         ('9', 'SWR-009', 'Cashmere Sweater', 'Luxury cashmere pullover', 249.99, 18, 'Tops', 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&fit=crop', 5),
         ('10', 'CHN-010', 'Chino Pants', 'Classic fit chino pants', 59.99, 35, 'Bottoms', 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=400&fit=crop', 15),
-        ('11', 'PLO-011', 'Polo Shirt', 'Classic polo shirt', 49.99, 0, 'Tops', 'https://images.unsplash.com/photo-1625910513413-5fc45b28e9d5?w=400&h=400&fit=crop', 20),
-        ('12', 'CTN-012', 'Trench Coat', 'Waterproof trench coat', 189.99, 7, 'Outerwear', 'https://images.unsplash.com/photo-1544923246-77307dd628b7?w=400&h=400&fit=crop', 5)
+        ('11', 'PLO-011', 'Polo Shirt', 'Classic polo shirt', 49.99, 0, 'Tops', 'https://www.harmontblaine.com/on/demandware.static/-/Sites-harmont-m-catalog/default/dwc73c149d/images/large/LN1010N21054_999_1.jpg', 20),
+        ('12', 'CTN-012', 'Trench Coat', 'Waterproof trench coat', 189.99, 7, 'Outerwear', 'https://hips.hearstapps.com/hmg-prod/images/f5270e62-7439-45a1-a414-4a7ba3e8e94c.jpeg?crop=0.667xw:1xh;0.166xw,0xh&resize=1120:*', 5)
       `);
     }
 

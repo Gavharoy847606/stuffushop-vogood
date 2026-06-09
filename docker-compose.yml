@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   # Nginx Load Balancer (Trafikni qabul qilib, backend nusxalariga bo'luvchi yagona nuqta)
   nginx:
@@ -16,7 +15,6 @@ services:
     restart: unless-stopped
     networks:
       - stuffus_network
-
   # 1-Nusxa (Replica 1)
   erp_backend_1:
     build: .
@@ -32,7 +30,6 @@ services:
     restart: unless-stopped
     networks:
       - stuffus_network
-
   # 2-Nusxa (Replica 2)
   erp_backend_2:
     build: .
