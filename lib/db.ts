@@ -134,6 +134,7 @@ export async function initDb() {
         ('11', 'PLO-011', 'Polo Shirt', 'Classic polo shirt', 49.99, 0, 'Tops', 'https://www.harmontblaine.com/on/demandware.static/-/Sites-harmont-m-catalog/default/dwc73c149d/images/large/LN1010N21054_999_1.jpg', 20),
         ('12', 'CTN-012', 'Polo Shirt', 'Polo shirt', 49.99, 0, 'Tops', 'https://www.harmontblaine.com/on/demandware.static/-/Sites-harmont-m-catalog/default/dwc73c149d/images/large/LN1010N21054_999_1.jpg', 20),
         ('13', 'CTN-013', 'Trench Coat', 'Waterproof trench coat', 189.99, 7, 'Outerwear', 'https://images.unsplash.com/photo-1544923246-77307dd628b7?w=400&h=400&fit=crop', 5)
+        ('11', 'CTN-014', 'Trench Coat', 'Waterproof trench coat', 189.99, 7, 'Outerwear', 'https://rheacosta-shop.com/cdn/shop/files/2964-marlene-camel-trench-coat-dress-gallery-2.jpg?v=1712066159&width=1080', 6)
       `);
     }
 

@@ -165,7 +165,7 @@ function LowStockWidget() {
                     const t = e.currentTarget as HTMLImageElement;
                     t.onerror = null;
                     t.src =
-                      "https://kaleidoscope.scene7.com/is/image/OttoUK/600w/Witt-Denim-Pleat-Midi-Skirt~B51972FRSP.jpg";
+                      "https://www.vettedmag.com/wp-content/uploads/2025/05/claire-rose-in-a-midi-pleated-skirt.jpg.webp";
                   }}
                   className="w-400 h-100 rounded-lg object-cover"
                 />

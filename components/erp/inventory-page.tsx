@@ -178,7 +178,7 @@ export function InventoryPage() {
           </div>
           <div className="flex gap-3">
             <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[180px] bg-input/50 border-glass-border">
+              <SelectTrigger className="w-\[180px\] bg-input/50 border-glass-border">
                 <Filter className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Filter by" />
               </SelectTrigger>
@@ -225,7 +225,6 @@ export function InventoryPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredProducts.map((product) => (
-            
             <ProductCard
               key={product.id}
               product={product}
