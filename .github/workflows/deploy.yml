@@ -1,33 +1,49 @@
-name: CI/CD Enterprise ERP Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
+      - "agents/**"
 
 jobs:
-  validate-and-test:
+  build:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.15.6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: 'npm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --force
 
-      - name: Validate Docker Compose Configuration
-        run: docker compose config
+      - name: Build project
+        run: pnpm build
 
-  deploy-to-render:
-    needs: validate-and-test
+  deploy:
+    name: Deploy to EC2
+    needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Trigger Render.com Production Deployment
-        run: |
-          curl -X POST "${{ secrets.RENDER_FRONTEND_WEBHOOK }}"
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/stuffushop
+            git pull origin main
+            sudo docker compose up -d --build
