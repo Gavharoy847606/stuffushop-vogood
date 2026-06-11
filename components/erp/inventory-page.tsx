@@ -32,25 +32,27 @@ function ProductCard({ product, onUpdateStock }: ProductCardProps) {
 
   return (
     <div className="glass-card-hover overflow-hidden group">
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden">
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          onError={(e) => {
-            const target = e.currentTarget as HTMLImageElement;
-            target.onerror = null;
-            target.src =
-              "https://images.unsplash.com/photo-1583496661160-fb5886a0edd1?w=400&h=400&fit=crop";
-          }}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        {/* SKU Badge */}
+
+      <div className="relative aspect-square overflow-hidden bg-muted flex items-center justify-center">
+        {product.image && (
+          <img
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              target.onerror = null;
+              target.style.display = "none";
+            }}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        )}
+        {!product.image && (
+          <Package className="w-16 h-16 text-muted-foreground" />
+        )}
         <Badge className="absolute top-2 left-2 bg-background/80 backdrop-blur-sm text-foreground border-glass-border">
           {product.sku}
         </Badge>
-        {/* Status Badge */}
         {isOutOfStock && (
           <Badge className="absolute top-2 right-2 bg-destructive text-destructive-foreground border-0">
             Out of Stock
