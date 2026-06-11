@@ -66,7 +66,7 @@ function ProductCard({ product, onUpdateStock }: ProductCardProps) {
         )}
       </div>
 
-      {/* Content */}
+      {/* Content narxi va shu kabilar */}
       <div className="p-4 space-y-3">
         <div>
           <h3 className="font-semibold text-foreground line-clamp-1">
